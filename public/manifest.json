@@ -1,0 +1,35 @@
+{
+  "name": "Lens Share",
+  "version": "0.1.1",
+  "manifest_version": 3,
+  "description": "Lens Share",
+  "homepage_url": "https://lens-share.apoorv.xyz",
+  "action": {
+    "default_title": "Lens Share",
+    "default_icon": {
+      "128": "./icons/icon128.png"
+    },
+    "default_popup": "index.html"
+  },
+  "icons": {
+    "128": "./icons/icon128.png",
+    "48": "./icons/icon48.png",
+    "16": "./icons/icon16.png"
+  },
+  "content_scripts": [
+    {
+      "matches": ["file://*/*", "http://*/*", "https://*/*"],
+      "js": ["static/js/inject.js"],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "permissions": ["activeTab", "storage"],
+  "host_permissions": ["https://*/*", "http://*/*"],
+  "web_accessible_resources": [
+    {
+      "resources": ["static/js/impersonator.js"],
+      "matches": ["file://*/*", "http://*/*", "https://*/*"]
+    }
+  ]
+}
