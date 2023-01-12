@@ -18,7 +18,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["file://*/*", "http://*/*", "https://*/*"],
+      "matches": ["https://*.twitter.com/*"],
       "js": ["static/js/inject.js"],
       "run_at": "document_start",
       "all_frames": true
