@@ -1,9 +1,9 @@
 const init = async () => {
-  // inject impersonator.js into webpage
+  // inject lens-share.js into webpage
   try {
     let script = document.createElement("script");
     script.setAttribute("type", "text/javascript");
-    script.src = chrome.runtime.getURL("/static/js/impersonator.js");
+    script.src = chrome.runtime.getURL("/static/js/lens-share.js");
     script.onload = async function () {
       // @ts-ignore
       this.remove();

@@ -14,7 +14,7 @@ module.exports = {
               require.resolve("react-dev-utils/webpackHotDevClient"),
             paths.appIndexJs,
           ].filter(Boolean),
-          impersonator: "./src/chrome/impersonator.ts",
+          "lens-share": "./src/chrome/lens-share.ts",
           inject: "./src/chrome/inject.ts",
         },
         optimization: {
