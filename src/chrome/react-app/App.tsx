@@ -1,7 +1,11 @@
-import React from "react";
+import ShareOnLens from "./components/WalletLogin/ShareOnLens";
 
 function App() {
-  return <div>App</div>;
+  return (
+    <div>
+      <ShareOnLens />
+    </div>
+  );
 }
 
 export default App;

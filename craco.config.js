@@ -18,7 +18,6 @@ module.exports = {
           // content script
           inject: "./src/chrome/inject.ts",
           // injected code
-          "lens-share": "./src/chrome/lens-share.ts",
           "lens-share-react-app": "./src/chrome/react-app/index.tsx",
         },
         optimization: {
