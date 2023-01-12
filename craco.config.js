@@ -9,13 +9,17 @@ module.exports = {
       return {
         ...webpackConfig,
         entry: {
+          // react app for the popup
           main: [
             env === "development" &&
               require.resolve("react-dev-utils/webpackHotDevClient"),
             paths.appIndexJs,
           ].filter(Boolean),
-          "lens-share": "./src/chrome/lens-share.ts",
+          // content script
           inject: "./src/chrome/inject.ts",
+          // injected code
+          "lens-share": "./src/chrome/lens-share.ts",
+          "lens-share-react-app": "./src/chrome/react-app/index.tsx",
         },
         optimization: {
           ...webpackConfig.optimization,

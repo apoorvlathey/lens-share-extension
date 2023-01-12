@@ -28,7 +28,10 @@
   "host_permissions": ["https://*/*", "http://*/*"],
   "web_accessible_resources": [
     {
-      "resources": ["static/js/lens-share.js"],
+      "resources": [
+        "static/js/lens-share.js",
+        "static/js/lens-share-react-app.js"
+      ],
       "matches": ["file://*/*", "http://*/*", "https://*/*"]
     }
   ]
