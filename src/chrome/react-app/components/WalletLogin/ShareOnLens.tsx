@@ -27,6 +27,7 @@ import {
 import useSupportedChain from "../../hooks/useSupportedChain";
 import { supportedChains } from "../../config";
 import slicedAddress from "../../utils/slicedAddress";
+import Identicon from "./Identicon";
 
 function ShareOnLens() {
   const { connect, connectors, isLoading, pendingConnector } = useConnect();
@@ -129,7 +130,7 @@ function ShareOnLens() {
                   borderRadius="xl"
                   py="0"
                 >
-                  <Box
+                  <HStack
                     bg="gray.800"
                     border="1px solid transparent"
                     borderRadius="xl"
@@ -137,16 +138,17 @@ function ShareOnLens() {
                     px={3}
                     h="38px"
                   >
+                    <Text>Connected:</Text>
+                    <Identicon />
                     <Text
                       color="white"
                       fontSize="md"
                       fontWeight="medium"
                       mr="2"
                     >
-                      Connected: {slicedAddress(address)}
+                      {slicedAddress(address)}
                     </Text>
-                    {/* <Identicon /> */}
-                  </Box>
+                  </HStack>
                 </Box>
                 {!isSupportedChain ? (
                   <Box>
