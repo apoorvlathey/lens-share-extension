@@ -4,6 +4,7 @@
   "version": "0.1.1",
   "private": true,
   "dependencies": {
+    "@apollo/client": "^3.7.4",
     "@chakra-ui/icons": "^1.0.15",
     "@chakra-ui/react": "^1.6.6",
     "@craco/craco": "^6.4.5",
@@ -20,16 +21,21 @@
     "@types/node": "^16.7.2",
     "@types/react": "^17.0.19",
     "@types/react-dom": "^17.0.9",
+    "axios": "^1.2.2",
     "dotenv-webpack": "^8.0.1",
     "ethers": "^5.7.2",
     "framer-motion": "^4",
+    "graphql": "^16.6.0",
+    "jwt-decode": "^3.1.2",
     "node-polyfill-webpack-plugin": "^2.0.1",
+    "omit-deep": "^0.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.0",
     "terser-webpack-plugin": "^5.3.6",
     "ts-loader": "^9.4.2",
     "typescript": "^4.9.4",
+    "uuid": "^9.0.0",
     "wagmi": "^0.10.10",
     "web-vitals": "^0.2.4"
   },
@@ -58,6 +64,7 @@
     ]
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.196"
+    "@types/chrome": "^0.0.196",
+    "@types/uuid": "^9.0.0"
   }
 }

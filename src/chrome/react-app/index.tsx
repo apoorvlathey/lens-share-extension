@@ -5,6 +5,7 @@ import { WagmiConfig, createClient, configureChains } from "wagmi";
 import { jsonRpcProvider } from "wagmi/providers/jsonRpc";
 import { InjectedConnector } from "wagmi/connectors/injected";
 import { supportedChains, chainIdToRPC } from "./config";
+import { LensProvider } from "./contexts/LensContext";
 import theme from "./theme";
 import App from "./App";
 
@@ -55,7 +56,9 @@ const root = createRoot(app);
 root.render(
   <ChakraProvider theme={theme}>
     <WagmiConfig client={client}>
-      <App />
+      <LensProvider>
+        <App />
+      </LensProvider>
     </WagmiConfig>
   </ChakraProvider>
 ); // Render react component

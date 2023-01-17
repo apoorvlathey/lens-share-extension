@@ -16,7 +16,10 @@ import {
   Image,
   Heading,
   Stack,
+  VStack,
+  Link,
 } from "@chakra-ui/react";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
   Connector,
   useConnect,
@@ -24,8 +27,9 @@ import {
   useNetwork,
   useSwitchNetwork,
 } from "wagmi";
-import useSupportedChain from "../../hooks/useSupportedChain";
 import { supportedChains } from "../../config";
+import useSupportedChain from "../../hooks/useSupportedChain";
+import { useLens } from "../../contexts/LensContext";
 import slicedAddress from "../../utils/slicedAddress";
 import Identicon from "./Identicon";
 
@@ -35,6 +39,13 @@ function ShareOnLens() {
   const { chain } = useNetwork();
   const { switchNetwork } = useSwitchNetwork();
   const { isSupportedChain } = useSupportedChain();
+  const {
+    isFetchingProfile,
+    lensHandle,
+    createPost,
+    postingText: loadingText,
+    isPosting,
+  } = useLens();
 
   const {
     isOpen: isModalOpen,
@@ -146,7 +157,7 @@ function ShareOnLens() {
                       fontWeight="medium"
                       mr="2"
                     >
-                      {slicedAddress(address)}
+                      {lensHandle ?? slicedAddress(address)}
                     </Text>
                   </HStack>
                 </Box>
@@ -185,8 +196,48 @@ function ShareOnLens() {
                       ))}
                     </Stack>
                   </Box>
+                ) : !lensHandle ? (
+                  !isFetchingProfile && (
+                    <VStack pt="2rem">
+                      <Text
+                        fontWeight={"bold"}
+                        color="white"
+                        bgColor={"red.400"}
+                        py="0.5rem"
+                        px="1rem"
+                        rounded="lg"
+                      >{`⚠️ Lens Profile doesn't exist`}</Text>
+                      <Flex
+                        flexDir={["column", "row", "row"]}
+                        alignItems="center"
+                        color="white"
+                      >
+                        <Text>Claim your profile at</Text>
+                        <Link ml="1" href="https://claim.lens.xyz/" isExternal>
+                          https://claim.lens.xyz/ <ExternalLinkIcon />
+                        </Link>
+                      </Flex>
+                    </VStack>
+                  )
                 ) : (
-                  "TODO: fetch lens profile"
+                  <Button
+                    color={"white"}
+                    fontWeight="bold"
+                    bgColor={"green.600"}
+                    border="2px solid"
+                    borderColor={"green.600"}
+                    _hover={{
+                      bgColor: "green.800",
+                      color: "white",
+                    }}
+                    boxShadow="lg"
+                    onClick={() => alert("tweet posted")}
+                    isLoading={isPosting}
+                    loadingText={loadingText}
+                    disabled={!lensHandle}
+                  >
+                    POST 🌿
+                  </Button>
                 )}
               </>
             )}
