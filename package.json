@@ -4,14 +4,17 @@
   "version": "0.1.1",
   "private": true,
   "dependencies": {
-    "@chakra-ui/icons": "^1.0.15",
-    "@chakra-ui/react": "^1.6.6",
+    "@apollo/client": "^3.7.4",
+    "@chakra-ui/icons": "^1.1.7",
+    "@chakra-ui/react": "^1.8.9",
+    "@chakra-ui/theme-tools": "^2.0.16",
     "@craco/craco": "^6.4.5",
     "@emotion/react": "^11",
     "@emotion/styled": "^11",
     "@ethersproject/bytes": "^5.7.0",
     "@ethersproject/logger": "^5.7.0",
     "@ethersproject/providers": "^5.7.1",
+    "@metamask/jazzicon": "^2.0.0",
     "@testing-library/jest-dom": "^5.11.4",
     "@testing-library/react": "^11.1.0",
     "@testing-library/user-event": "^12.1.10",
@@ -19,16 +22,22 @@
     "@types/node": "^16.7.2",
     "@types/react": "^17.0.19",
     "@types/react-dom": "^17.0.9",
+    "axios": "^1.2.2",
+    "chains": "link:@wagmi/core/chains",
     "dotenv-webpack": "^8.0.1",
     "ethers": "^5.7.2",
     "framer-motion": "^4",
+    "ipfs-http-client": "^60.0.0",
+    "jwt-decode": "^3.1.2",
     "node-polyfill-webpack-plugin": "^2.0.1",
+    "omit-deep": "^0.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-scripts": "5.0.0",
     "terser-webpack-plugin": "^5.3.6",
     "ts-loader": "^9.4.2",
     "typescript": "^4.9.4",
+    "uuid": "^9.0.0",
     "wagmi": "^0.10.10",
     "web-vitals": "^0.2.4"
   },
@@ -57,6 +66,7 @@
     ]
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.196"
+    "@types/chrome": "^0.0.196",
+    "@types/uuid": "^9.0.0"
   }
 }

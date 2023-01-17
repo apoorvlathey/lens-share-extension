@@ -1,5 +1,3 @@
-const injectScript = (name: string) => {};
-
 const init = async () => {
   // inject lens-share-react-app.js into webpage
   try {
