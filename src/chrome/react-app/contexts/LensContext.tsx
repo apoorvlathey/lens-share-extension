@@ -104,27 +104,27 @@ const createPostTypedData = (createPostTypedDataRequest: any) => {
 
 // NOTE: keeping ipfs logic in the same file or else build throws error
 const uploadIpfs = async (data: any) => {
-  const result = await fetchViaContentScript({
-    type: "IPFS_CLIENT_ADD",
+  const cid = await fetchViaContentScript({
+    type: "UPLOAD_IPFS",
     msg: {
-      data: JSON.stringify(data),
+      data,
     },
   });
 
-  console.log("upload result ipfs", result);
-  return "ipfs://" + result.path;
+  console.log("upload result ipfs", cid);
+  return "ipfs://" + cid;
 };
 
 const uploadFromURLToIpfs = async (url: string) => {
-  const result = await fetchViaContentScript({
-    type: "IPFS_CLIENT_ADD",
+  const cid = await fetchViaContentScript({
+    type: "UPLOAD_IPFS_FROM_URL",
     msg: {
-      data: urlSource(url),
+      url,
     },
   });
 
-  console.log("upload result ipfs", result);
-  return "ipfs://" + result.cid.toString();
+  console.log("upload result ipfs", cid);
+  return "ipfs://" + cid;
 };
 
 // get rendered text from html code
@@ -268,7 +268,7 @@ export const LensProvider = ({ children }: { children?: React.ReactNode }) => {
     )[0];
     let tweetPhotoUrls: { url: string; mimeType: string }[] = [];
     // filter out current tweet's photos
-    for (var i = 0; i < allTweetPhotos.length; i++) {
+    for (let i = 0; i < allTweetPhotos.length; i++) {
       if (!quotedTweet.contains(allTweetPhotos[i])) {
         // src is of the following format: https://pbs.twimg.com/media/xxxxxxxxxxx?format=jpg&name=360x360
         let src = allTweetPhotos[i].querySelector("img")!.src;
@@ -292,7 +292,7 @@ export const LensProvider = ({ children }: { children?: React.ReactNode }) => {
       type: string;
     }[] = [];
     if (tweetPhotoUrls.length > 0) {
-      for (var i = 0; i < tweetPhotoUrls.length; i++) {
+      for (let i = 0; i < tweetPhotoUrls.length; i++) {
         media.push({
           item: await uploadFromURLToIpfs(tweetPhotoUrls[i].url),
           type: tweetPhotoUrls[i].mimeType,

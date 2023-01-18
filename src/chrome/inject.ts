@@ -1,6 +1,7 @@
 import { apolloClient } from "./apollo-client";
 import { gql } from "@apollo/client";
-import { create } from "ipfs-http-client";
+import { create, urlSource } from "ipfs-http-client";
+var Buffer = require("buffer/").Buffer; // note: the trailing slash is important!
 
 const init = async () => {
   // inject lens-share-react-app.js into webpage
@@ -238,11 +239,20 @@ window.addEventListener("message", async (e) => {
       sendRes(e.data.type, res);
       break;
     }
-    case "IPFS_CLIENT_ADD": {
+    case "UPLOAD_IPFS": {
       const data = e.data.msg.data as any;
-      const res = await client.add(data);
+      const res = await client.add(JSON.stringify(data));
+      const cid = res.path;
       // send res back to react-app
-      sendRes(e.data.type, res);
+      sendRes(e.data.type, cid);
+      break;
+    }
+    case "UPLOAD_IPFS_FROM_URL": {
+      const url = e.data.msg.url as string;
+      const res = await client.add(urlSource(url));
+      const cid = res.cid.toString();
+      // send res back to react-app
+      sendRes(e.data.type, cid);
       break;
     }
   }

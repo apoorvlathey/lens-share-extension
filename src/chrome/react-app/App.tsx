@@ -18,6 +18,7 @@ import {
   Stack,
   VStack,
   Link,
+  Center,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
@@ -221,27 +222,29 @@ function App() {
                     </VStack>
                   )
                 ) : (
-                  <Button
-                    color={"white"}
-                    fontWeight="bold"
-                    bgColor={"green.600"}
-                    border="2px solid"
-                    borderColor={"green.600"}
-                    _hover={{
-                      bgColor: "green.800",
-                      color: "white",
-                    }}
-                    boxShadow="lg"
-                    onClick={async () => {
-                      await createPost();
-                      closeModal();
-                    }}
-                    isLoading={isPosting}
-                    loadingText={loadingText}
-                    disabled={!lensHandle}
-                  >
-                    POST 🌿
-                  </Button>
+                  <Center py="1rem">
+                    <Button
+                      color={"white"}
+                      fontWeight="bold"
+                      bgColor={"green.600"}
+                      border="2px solid"
+                      borderColor={"green.600"}
+                      _hover={{
+                        bgColor: "green.800",
+                        color: "white",
+                      }}
+                      boxShadow="lg"
+                      onClick={async () => {
+                        await createPost();
+                        closeModal();
+                      }}
+                      isLoading={isPosting}
+                      loadingText={loadingText}
+                      disabled={!lensHandle}
+                    >
+                      POST 🌿
+                    </Button>
+                  </Center>
                 )}
               </>
             )}
