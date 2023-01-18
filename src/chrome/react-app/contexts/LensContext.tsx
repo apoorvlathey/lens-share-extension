@@ -112,13 +112,6 @@ const uploadFromURLToIpfs = async (url: string) => {
   return "QmdF35Y3TVDebyQGGqRMWz2XqCRozkqSZ3UZ1ZqB2W1mQn";
 };
 
-const getImageMimeType = async (url: string) => {
-  // TODO: replace axios with fetchViaContentScript
-  // const res = await axios.get(url);
-  // return res.headers["content-type"]!;
-  return "image/png";
-};
-
 // get rendered text from html code
 const extractContent = (s: string) => {
   var span = document.createElement("span");
@@ -258,7 +251,7 @@ export const LensProvider = ({ children }: { children?: React.ReactNode }) => {
     const quotedTweet = article.querySelectorAll(
       'div[tabIndex="0"][role="link"]'
     )[0];
-    let tweetPhotoUrls: string[] = [];
+    let tweetPhotoUrls: { url: string; mimeType: string }[] = [];
     // filter out current tweet's photos
     for (var i = 0; i < allTweetPhotos.length; i++) {
       if (!quotedTweet.contains(allTweetPhotos[i])) {
@@ -268,7 +261,12 @@ export const LensProvider = ({ children }: { children?: React.ReactNode }) => {
         const url = new URL(src);
         url.searchParams.delete("name");
 
-        tweetPhotoUrls.push(url.toString());
+        const mimeType = new URLSearchParams(url.search).get("format")!;
+
+        tweetPhotoUrls.push({
+          url: url.toString(),
+          mimeType: mimeType,
+        });
       }
     }
 
@@ -281,8 +279,8 @@ export const LensProvider = ({ children }: { children?: React.ReactNode }) => {
     if (tweetPhotoUrls.length > 0) {
       for (var i = 0; i < tweetPhotoUrls.length; i++) {
         media.push({
-          item: await uploadFromURLToIpfs(tweetPhotoUrls[i]),
-          type: await getImageMimeType(tweetPhotoUrls[i]),
+          item: await uploadFromURLToIpfs(tweetPhotoUrls[i].url),
+          type: tweetPhotoUrls[i].mimeType,
         });
       }
 
