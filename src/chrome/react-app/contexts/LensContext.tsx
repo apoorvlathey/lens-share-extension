@@ -109,13 +109,21 @@ const uploadIpfs = async (data: any) => {
 
 // FIXME: replace with functional
 const uploadFromURLToIpfs = async (url: string) => {
-  return "Qmdjwa2wxMrvjsUsukVDd8pAbyv24wVRt6siULz4UPbYGX";
+  return "QmdF35Y3TVDebyQGGqRMWz2XqCRozkqSZ3UZ1ZqB2W1mQn";
 };
 
 const getImageMimeType = async (url: string) => {
   // TODO: replace axios with fetchViaContentScript
-  const res = await axios.get(url);
-  return res.headers["content-type"]!;
+  // const res = await axios.get(url);
+  // return res.headers["content-type"]!;
+  return "image/png";
+};
+
+// get rendered text from html code
+const extractContent = (s: string) => {
+  var span = document.createElement("span");
+  span.innerHTML = s;
+  return span.textContent || span.innerText;
 };
 
 type LensContextType = {
@@ -230,7 +238,7 @@ export const LensProvider = ({ children }: { children?: React.ReactNode }) => {
     localStorage.setItem("refreshToken", tokens.data.authenticate.refreshToken);
   };
 
-  const createPost = async (tweetText: string, tweetMedia?: TweetMedia[]) => {
+  const createPost = async () => {
     if (!lensHandle) {
       console.log("createPost: no lens handle");
       return;
@@ -239,17 +247,42 @@ export const LensProvider = ({ children }: { children?: React.ReactNode }) => {
 
     setLoadingText("Uploading to IPFS");
 
+    const article = document.querySelectorAll("article")[0]; // current tweet (with quotedTweet)
+    const tweetText = extractContent(
+      article.querySelectorAll('div[data-testid="tweetText"]')![0].innerHTML
+    );
+    // inclues photos of quotedTweets as well
+    const allTweetPhotos = article.querySelectorAll(
+      'div[data-testid="tweetPhoto"]'
+    );
+    const quotedTweet = article.querySelectorAll(
+      'div[tabIndex="0"][role="link"]'
+    )[0];
+    let tweetPhotoUrls: string[] = [];
+    // filter out current tweet's photos
+    for (var i = 0; i < allTweetPhotos.length; i++) {
+      if (!quotedTweet.contains(allTweetPhotos[i])) {
+        // src is of the following format: https://pbs.twimg.com/media/xxxxxxxxxxx?format=jpg&name=360x360
+        let src = allTweetPhotos[i].querySelector("img")!.src;
+        // we need to remove the `name` parameter to get image with original size
+        const url = new URL(src);
+        url.searchParams.delete("name");
+
+        tweetPhotoUrls.push(url.toString());
+      }
+    }
+
     let image: null | string = null;
     let imageMimeType: null | string = null;
     let media: {
       item: string;
       type: string;
     }[] = [];
-    if (tweetMedia) {
-      for (var i = 0; i < tweetMedia.length; i++) {
+    if (tweetPhotoUrls.length > 0) {
+      for (var i = 0; i < tweetPhotoUrls.length; i++) {
         media.push({
-          item: await uploadFromURLToIpfs(tweetMedia[i].url!),
-          type: await getImageMimeType(tweetMedia[i].url!),
+          item: await uploadFromURLToIpfs(tweetPhotoUrls[i]),
+          type: await getImageMimeType(tweetPhotoUrls[i]),
         });
       }
 

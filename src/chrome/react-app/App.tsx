@@ -232,7 +232,8 @@ function App() {
                       color: "white",
                     }}
                     boxShadow="lg"
-                    onClick={() => alert("tweet posted")}
+                    // TODO: close modal when successfully posted
+                    onClick={() => createPost()}
                     isLoading={isPosting}
                     loadingText={loadingText}
                     disabled={!lensHandle}
