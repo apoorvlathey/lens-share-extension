@@ -102,7 +102,6 @@ const createPostTypedData = (createPostTypedDataRequest: any) => {
   });
 };
 
-// NOTE: keeping ipfs logic in the same file or else build throws error
 const uploadIpfs = async (data: any) => {
   const cid = await fetchViaContentScript({
     type: "UPLOAD_IPFS",
@@ -269,7 +268,7 @@ export const LensProvider = ({ children }: { children?: React.ReactNode }) => {
     let tweetPhotoUrls: { url: string; mimeType: string }[] = [];
     // filter out current tweet's photos
     for (let i = 0; i < allTweetPhotos.length; i++) {
-      if (!quotedTweet.contains(allTweetPhotos[i])) {
+      if (!quotedTweet || !quotedTweet.contains(allTweetPhotos[i])) {
         // src is of the following format: https://pbs.twimg.com/media/xxxxxxxxxxx?format=jpg&name=360x360
         let src = allTweetPhotos[i].querySelector("img")!.src;
         // we need to remove the `name` parameter to get image with original size
