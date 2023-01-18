@@ -232,8 +232,10 @@ function App() {
                       color: "white",
                     }}
                     boxShadow="lg"
-                    // TODO: close modal when successfully posted
-                    onClick={() => createPost()}
+                    onClick={async () => {
+                      await createPost();
+                      closeModal();
+                    }}
                     isLoading={isPosting}
                     loadingText={loadingText}
                     disabled={!lensHandle}
