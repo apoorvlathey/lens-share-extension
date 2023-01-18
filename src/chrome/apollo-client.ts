@@ -9,7 +9,7 @@ import {
 import { onError } from "@apollo/client/link/error";
 import jwtDecode from "jwt-decode";
 import axios from "axios";
-import { config } from "./config";
+import { config } from "./react-app/config";
 
 const REFRESH_AUTHENTICATION = `
   mutation($request: RefreshRequest!) { 

@@ -150,6 +150,7 @@ function ShareOnLens() {
                     h="38px"
                   >
                     <Text>Connected:</Text>
+                    {/* Can't display lensAvatar here due to Twitter's Content Security Policy directive: "img-src 'self'*/}
                     <Identicon />
                     <Text
                       color="white"

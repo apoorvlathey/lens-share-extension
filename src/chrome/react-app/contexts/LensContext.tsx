@@ -1,7 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
 import { useToast } from "@chakra-ui/react";
-import { apolloClient } from "../apollo-client";
-import { gql } from "@apollo/client";
 import {
   useAccount,
   usePrepareContractWrite,
@@ -18,147 +16,87 @@ import { omit, prettyJSON } from "../utils/helpers";
 import { Metadata } from "../interfaces/publication";
 import { TweetMedia } from "../interfaces/TweetMedia";
 
-const GET_DEFAULT_PROFILES = `
-  query($request: DefaultProfileRequest!) {
-    defaultProfile(request: $request) {
-      id
-      handle
-      picture {
-        ... on NftImage {
-          contractAddress
-          tokenId
-          uri
-          chainId
-          verified
-        }
-        ... on MediaSet {
-          original {
-            url
-            mimeType
-          }
-        }
-      }
-    }
-  }
-`;
-const GET_PROFILES = `
-  query($request: ProfileQueryRequest!) {
-    profiles(request: $request) {
-      items {
-        id
-        handle
-        picture {
-          ... on NftImage {
-            contractAddress
-            tokenId
-            uri
-            verified
-          }
-          ... on MediaSet {
-            original {
-              url
-              mimeType
-            }
-          }
-        }
-      }
-    }
-  }
-`;
-const GET_CHALLENGE = `
-  query($request: ChallengeRequest!) {
-    challenge(request: $request) { text }
-  }
-`;
-const AUTHENTICATION = `
-  mutation($request: SignedAuthChallenge!) { 
-    authenticate(request: $request) {
-      accessToken
-      refreshToken
-    }
- }
-`;
-const CREATE_POST_TYPED_DATA = `
-  mutation($request: CreatePublicPostRequest!) { 
-    createPostTypedData(request: $request) {
-      id
-      expiresAt
-      typedData {
-        types {
-          PostWithSig {
-            name
-            type
-          }
-        }
-      domain {
-        name
-        chainId
-        version
-        verifyingContract
-      }
-      value {
-        nonce
-        deadline
-        profileId
-        contentURI
-        collectModule
-        collectModuleInitData
-        referenceModule
-        referenceModuleInitData
-      }
-    }
-  }
-}
-`;
+const fetchViaContentScript = (msgObj: {
+  type: string;
+  msg: any;
+}): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    // send message to content_script (inject.ts)
+    window.postMessage(msgObj, "*");
 
-const getDefaultProfile = async (ethereumAddress: string) => {
-  return await apolloClient.query({
-    query: gql(GET_DEFAULT_PROFILES),
-    variables: {
-      request: {
-        ethereumAddress,
+    // receive from content_script (inject.ts)
+    const controller = new AbortController();
+    window.addEventListener(
+      "message",
+      (e: any) => {
+        // only accept messages from us
+        if (e.source !== window) {
+          return;
+        }
+
+        if (!e.data.type) {
+          return;
+        }
+
+        switch (e.data.type) {
+          case `res_${msgObj.type}`: {
+            const res = e.data.msg.res;
+
+            // remove this listener to avoid duplicates in future
+            controller.abort();
+
+            resolve(res);
+            break;
+          }
+        }
       },
+      { signal: controller.signal } as AddEventListenerOptions
+    );
+  });
+};
+
+const getDefaultProfile = (ethereumAddress: string): Promise<any> => {
+  return fetchViaContentScript({
+    type: "GET_DEFAULT_PROFILES",
+    msg: {
+      ethereumAddress,
     },
   });
 };
 
 const getProfiles = (ethereumAddress: string) => {
-  return apolloClient.query({
-    query: gql(GET_PROFILES),
-    variables: {
-      request: { ownedBy: [ethereumAddress], limit: 1 },
+  return fetchViaContentScript({
+    type: "GET_PROFILES",
+    msg: {
+      ethereumAddress,
     },
   });
 };
 
 const generateChallenge = (address: string) => {
-  return apolloClient.query({
-    query: gql(GET_CHALLENGE),
-    variables: {
-      request: {
-        address,
-      },
+  return fetchViaContentScript({
+    type: "GET_CHALLENGE",
+    msg: {
+      address,
     },
   });
 };
 
 const authenticate = (address: string, signature: string) => {
-  return apolloClient.mutate({
-    mutation: gql(AUTHENTICATION),
-    variables: {
-      request: {
-        address,
-        signature,
-      },
+  return fetchViaContentScript({
+    type: "AUTHENTICATION",
+    msg: {
+      address,
+      signature,
     },
   });
 };
 
 const createPostTypedData = (createPostTypedDataRequest: any) => {
-  return apolloClient.mutate({
-    mutation: gql(CREATE_POST_TYPED_DATA),
-    variables: {
-      request: createPostTypedDataRequest,
+  return fetchViaContentScript({
+    type: "CREATE_POST_TYPED_DATA",
+    msg: {
+      createPostTypedDataRequest,
     },
   });
 };
@@ -175,6 +113,7 @@ const uploadFromURLToIpfs = async (url: string) => {
 };
 
 const getImageMimeType = async (url: string) => {
+  // TODO: replace axios with fetchViaContentScript
   const res = await axios.get(url);
   return res.headers["content-type"]!;
 };
