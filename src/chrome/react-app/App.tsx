@@ -164,8 +164,8 @@ function App() {
                   </HStack>
                 </Box>
                 {!isSupportedChain ? (
-                  <Box>
-                    <Heading>🔁 Switch Network</Heading>
+                  <Center flexDir={"column"} py="1rem">
+                    <Heading size="md">🔁 Switch Network:</Heading>
                     <Stack spacing={3} my="1rem" mx="auto" maxW="12rem">
                       {supportedChains.map((_chain, i) => (
                         <Button
@@ -197,10 +197,10 @@ function App() {
                         </Button>
                       ))}
                     </Stack>
-                  </Box>
+                  </Center>
                 ) : !lensHandle ? (
                   !isFetchingProfile && (
-                    <VStack pt="2rem">
+                    <VStack py="2rem">
                       <Text
                         fontWeight={"bold"}
                         color="white"
