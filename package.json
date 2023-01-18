@@ -26,6 +26,7 @@
     "ethers": "^5.7.2",
     "framer-motion": "^4",
     "graphql": "^16.6.0",
+    "ipfs-http-client": "^60.0.0",
     "jwt-decode": "^3.1.2",
     "node-polyfill-webpack-plugin": "^2.0.1",
     "omit-deep": "^0.3.0",

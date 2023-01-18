@@ -10,6 +10,7 @@ import {
 import { ethers } from "ethers";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
+import { urlSource } from "ipfs-http-client";
 import { config } from "../config";
 import LensHubABI from "../abi/LensHub.json";
 import { omit, prettyJSON } from "../utils/helpers";
@@ -102,14 +103,28 @@ const createPostTypedData = (createPostTypedDataRequest: any) => {
 };
 
 // NOTE: keeping ipfs logic in the same file or else build throws error
-// FIXME: replace with functional
 const uploadIpfs = async (data: any) => {
-  return "Qmdjwa2wxMrvjsUsukVDd8pAbyv24wVRt6siULz4UPbYGX";
+  const result = await fetchViaContentScript({
+    type: "IPFS_CLIENT_ADD",
+    msg: {
+      data: JSON.stringify(data),
+    },
+  });
+
+  console.log("upload result ipfs", result);
+  return "ipfs://" + result.path;
 };
 
-// FIXME: replace with functional
 const uploadFromURLToIpfs = async (url: string) => {
-  return "QmdF35Y3TVDebyQGGqRMWz2XqCRozkqSZ3UZ1ZqB2W1mQn";
+  const result = await fetchViaContentScript({
+    type: "IPFS_CLIENT_ADD",
+    msg: {
+      data: urlSource(url),
+    },
+  });
+
+  console.log("upload result ipfs", result);
+  return "ipfs://" + result.cid.toString();
 };
 
 // get rendered text from html code

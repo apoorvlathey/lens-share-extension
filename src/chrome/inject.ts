@@ -1,5 +1,6 @@
 import { apolloClient } from "./apollo-client";
 import { gql } from "@apollo/client";
+import { create } from "ipfs-http-client";
 
 const init = async () => {
   // inject lens-share-react-app.js into webpage
@@ -33,7 +34,7 @@ const init = async () => {
 
 init();
 
-// --- GraphQl / Axios fetchers ---
+// --- GraphQl / Axios / IPFS fetchers ---
 
 const GET_DEFAULT_PROFILES = `
   query($request: DefaultProfileRequest!) {
@@ -128,6 +129,22 @@ const CREATE_POST_TYPED_DATA = `
 }
 `;
 
+const auth =
+  "Basic " +
+  Buffer.from(
+    process.env.REACT_APP_INFURA_ID +
+      ":" +
+      process.env.REACT_APP_INFURA_SECRET_KEY
+  ).toString("base64");
+const client = create({
+  host: "ipfs.infura.io",
+  port: 5001,
+  protocol: "https",
+  headers: {
+    authorization: auth,
+  },
+});
+
 const sendRes = (type: string, res: any) => {
   window.postMessage(
     {
@@ -217,6 +234,13 @@ window.addEventListener("message", async (e) => {
           request: createPostTypedDataRequest,
         },
       });
+      // send res back to react-app
+      sendRes(e.data.type, res);
+      break;
+    }
+    case "IPFS_CLIENT_ADD": {
+      const data = e.data.msg.data as any;
+      const res = await client.add(data);
       // send res back to react-app
       sendRes(e.data.type, res);
       break;
