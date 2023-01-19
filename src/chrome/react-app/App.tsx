@@ -86,8 +86,6 @@ function App() {
                 }}
                 color={"white"}
                 onClick={openModal}
-                isLoading={isLoading}
-                loadingText="Connecting"
                 rounded={"3xl"}
               >
                 Share on Lens 🌿
