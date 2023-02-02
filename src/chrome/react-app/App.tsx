@@ -80,9 +80,11 @@ function App() {
   const [collectLimit, setCollectLimit] = useState<number>(1);
 
   const checkIfTwitterLoaded = () => {
-    const _shareContainer =
-      document.querySelector("time")?.parentElement?.parentElement
-        ?.parentElement?.parentElement;
+    // finding the parent row with Views
+    const _shareContainer = document.querySelector(
+      '[data-testid="app-text-transition-container"]'
+    )?.parentElement?.parentElement?.parentElement?.parentElement?.parentElement
+      ?.parentElement;
 
     if (_shareContainer) {
       clearInterval(btnGroupCheckTimer);
