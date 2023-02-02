@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   Button,
@@ -91,9 +91,30 @@ function App() {
   // wait for our target element to load
   var btnGroupCheckTimer = setInterval(checkIfTwitterLoaded, 200);
 
+  //
+  const observeUrlChange = () => {
+    let oldHref = document.location.href;
+    const body = document.querySelector("body");
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach(() => {
+        if (oldHref !== document.location.href) {
+          oldHref = document.location.href;
+
+          // New URL now, so find & set the container again
+          btnGroupCheckTimer = setInterval(checkIfTwitterLoaded, 200);
+        }
+      });
+    });
+    observer.observe(body!, { childList: true, subtree: true });
+  };
+
   const handleConnectWallet = (connector: Connector) => {
     connect({ connector });
   };
+
+  useEffect(() => {
+    observeUrlChange();
+  }, []);
 
   return (
     <>
