@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import { useToast } from "@chakra-ui/react";
+import { useToast, Link, HStack, Text } from "@chakra-ui/react";
+import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
   useAccount,
   usePrepareContractWrite,
@@ -7,7 +8,7 @@ import {
   useSignMessage,
   useSignTypedData,
 } from "wagmi";
-import { ethers } from "ethers";
+import { ethers, BigNumber } from "ethers";
 import axios from "axios";
 import { v4 as uuidv4 } from "uuid";
 import { urlSource } from "ipfs-http-client";
@@ -170,7 +171,7 @@ export const LensProvider = ({ children }: { children?: React.ReactNode }) => {
         status: "error",
         position: "bottom-right",
         isClosable: true,
-        duration: 4000,
+        duration: 4_000,
       });
     },
   });
@@ -186,7 +187,7 @@ export const LensProvider = ({ children }: { children?: React.ReactNode }) => {
           status: "error",
           position: "bottom-right",
           isClosable: true,
-          duration: 4000,
+          duration: 4_000,
         });
       },
     });
@@ -203,7 +204,7 @@ export const LensProvider = ({ children }: { children?: React.ReactNode }) => {
           status: "error",
           position: "bottom-right",
           isClosable: true,
-          duration: 4000,
+          duration: 4_000,
         });
       },
       async onSuccess(data, variables, context) {
@@ -212,15 +213,43 @@ export const LensProvider = ({ children }: { children?: React.ReactNode }) => {
           status: "info",
           position: "bottom-right",
           isClosable: true,
-          duration: 5000,
+          duration: 5_000,
         });
-        await data.wait();
+        const { logs } = await data.wait();
+        const topicId = ethers.utils.id(
+          "PostCreated(uint256,uint256,string,address,bytes,address,bytes,uint256)"
+        );
+        const profileCreatedLog = logs.find(
+          (l: any) => l.topics[0] === topicId
+        );
+        let profileCreatedEventLog = profileCreatedLog!.topics;
+        const publicationId = ethers.utils.defaultAbiCoder.decode(
+          ["uint256"],
+          profileCreatedEventLog[2]
+        )[0];
+
+        const internalPublicationId =
+          profileId + "-" + BigNumber.from(publicationId).toHexString();
+
         toast({
           title: "Posted Successfully",
+          description: (
+            <Link
+              href={`https://${
+                process.env.REACT_APP_USE_TESTNET === "true" ? "testnet." : ""
+              }lenster.xyz/posts/${internalPublicationId}`}
+              isExternal
+            >
+              <HStack>
+                <Text>View on Lenster</Text>
+                <ExternalLinkIcon />
+              </HStack>
+            </Link>
+          ),
           status: "success",
           position: "bottom-right",
           isClosable: true,
-          duration: 5000,
+          duration: 10_000,
         });
       },
     });
