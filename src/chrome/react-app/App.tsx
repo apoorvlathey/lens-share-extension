@@ -174,15 +174,41 @@ function App() {
                     >
                       <Text>Connected:</Text>
                       {/* Can't display lensAvatar here due to Twitter's Content Security Policy directive: "img-src 'self'*/}
-                      <Identicon />
-                      <Text
-                        color="white"
-                        fontSize="md"
-                        fontWeight="medium"
-                        mr="2"
-                      >
-                        {lensHandle ?? slicedAddress(address)}
-                      </Text>
+                      {lensHandle ? (
+                        <Link
+                          href={`https://${
+                            process.env.REACT_APP_USE_TESTNET === "true"
+                              ? "testnet."
+                              : ""
+                          }lenster.xyz/u/${lensHandle}`}
+                          isExternal
+                        >
+                          <HStack>
+                            <Identicon />
+                            <Text
+                              color="white"
+                              fontSize="md"
+                              fontWeight="medium"
+                              mr="2"
+                            >
+                              {lensHandle ?? slicedAddress(address)}
+                            </Text>
+                            <ExternalLinkIcon />
+                          </HStack>
+                        </Link>
+                      ) : (
+                        <HStack>
+                          <Identicon />
+                          <Text
+                            color="white"
+                            fontSize="md"
+                            fontWeight="medium"
+                            mr="2"
+                          >
+                            {lensHandle ?? slicedAddress(address)}
+                          </Text>
+                        </HStack>
+                      )}
                     </HStack>
                   </Box>
                 </Center>
@@ -225,7 +251,7 @@ function App() {
                   !isFetchingProfile && (
                     <VStack py="2rem">
                       <Text
-                        fontWeight={"bold"}
+                        fontWeight={"extrabold"}
                         color="white"
                         bgColor={"red.400"}
                         py="0.5rem"
