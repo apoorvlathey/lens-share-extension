@@ -80,18 +80,25 @@ function App() {
   const [collectLimit, setCollectLimit] = useState<number>(1);
 
   const checkIfTwitterLoaded = () => {
-    const _shareContainer = document.querySelector('[role="group"]');
+    const _shareContainer =
+      document.querySelector("time")?.parentElement?.parentElement
+        ?.parentElement?.parentElement;
+
     if (_shareContainer) {
       clearInterval(btnGroupCheckTimer);
 
-      setShareContainer(_shareContainer);
+      // only inject button if we are on the individual tweet's page
+      if (document.location.pathname.split(/\/(?=.)/).includes("status")) {
+        setShareContainer(_shareContainer);
+      } else {
+        setShareContainer(null);
+      }
     }
   };
 
   // wait for our target element to load
   var btnGroupCheckTimer = setInterval(checkIfTwitterLoaded, 200);
 
-  //
   const observeUrlChange = () => {
     let oldHref = document.location.href;
     const body = document.querySelector("body");
@@ -122,13 +129,15 @@ function App() {
         // Inject "Share on Lens" button into Twitter
         shareContainer &&
           createPortal(
-            <Box pb={"1rem"}>
+            <Box display={"flex"} justifyContent="end">
               <Button
                 backgroundColor={"green.500"}
                 _hover={{
                   backgroundColor: "green.700",
                 }}
                 color={"white"}
+                fontSize={"sm"}
+                h={"1.5rem"}
                 onClick={openModal}
                 rounded={"3xl"}
               >
