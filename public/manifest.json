@@ -8,8 +8,7 @@
     "default_title": "Lens Share",
     "default_icon": {
       "128": "./icons/icon128.png"
-    },
-    "default_popup": "index.html"
+    }
   },
   "icons": {
     "128": "./icons/icon128.png",
