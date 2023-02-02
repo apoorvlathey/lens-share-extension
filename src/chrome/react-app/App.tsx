@@ -19,6 +19,15 @@ import {
   VStack,
   Link,
   Center,
+  useBoolean,
+  Switch,
+  FormControl,
+  Input,
+  FormLabel,
+  FormErrorMessage,
+  InputGroup,
+  InputRightAddon,
+  Select,
 } from "@chakra-ui/react";
 import { ExternalLinkIcon } from "@chakra-ui/icons";
 import {
@@ -54,7 +63,21 @@ function App() {
     onClose: closeModal,
   } = useDisclosure();
 
+  // twitter dom element container to inject lens share button into
   const [shareContainer, setShareContainer] = useState<any>(null);
+
+  const [canCollect, setCanCollect] = useBoolean(true);
+  const [paidCollect, setPaidCollect] = useBoolean();
+  const [onlyFollowersCollect, setOnlyFollowersCollect] = useBoolean();
+  const [limitedEditionCollect, setLimitedEditionCollect] = useBoolean();
+  const [timeLimitCollect, setTimeLimitCollect] = useBoolean();
+
+  const currencies = ["Wrapped Matic", "WETH", "USDC", "DAI"];
+
+  const [price, setPrice] = useState(0);
+  const [currencyIndex, setCurrencyIndex] = useState(0);
+  const [referralFee, setReferralFee] = useState(0);
+  const [collectLimit, setCollectLimit] = useState(1);
 
   const checkIfTwitterLoaded = () => {
     const _shareContainer = document.querySelector('[role="group"]');
@@ -104,7 +127,7 @@ function App() {
         <ModalContent>
           <ModalHeader>Lens Share 🌿</ModalHeader>
           <ModalCloseButton />
-          <ModalBody>
+          <ModalBody mb={6}>
             {!address ? (
               <Flex flexDir={"column"} mb="1rem">
                 {connectors.map((connector, key) => (
@@ -133,34 +156,36 @@ function App() {
               </Flex>
             ) : (
               <>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  background="gray.700"
-                  borderRadius="xl"
-                  py="0"
-                >
-                  <HStack
-                    bg="gray.800"
-                    border="1px solid transparent"
+                <Center>
+                  <Box
+                    display="flex"
+                    alignItems="center"
+                    background="gray.700"
                     borderRadius="xl"
-                    m="1px"
-                    px={3}
-                    h="38px"
+                    py="0"
                   >
-                    <Text>Connected:</Text>
-                    {/* Can't display lensAvatar here due to Twitter's Content Security Policy directive: "img-src 'self'*/}
-                    <Identicon />
-                    <Text
-                      color="white"
-                      fontSize="md"
-                      fontWeight="medium"
-                      mr="2"
+                    <HStack
+                      bg="gray.800"
+                      border="1px solid transparent"
+                      borderRadius="xl"
+                      m="1px"
+                      px={3}
+                      h="38px"
                     >
-                      {lensHandle ?? slicedAddress(address)}
-                    </Text>
-                  </HStack>
-                </Box>
+                      <Text>Connected:</Text>
+                      {/* Can't display lensAvatar here due to Twitter's Content Security Policy directive: "img-src 'self'*/}
+                      <Identicon />
+                      <Text
+                        color="white"
+                        fontSize="md"
+                        fontWeight="medium"
+                        mr="2"
+                      >
+                        {lensHandle ?? slicedAddress(address)}
+                      </Text>
+                    </HStack>
+                  </Box>
+                </Center>
                 {!isSupportedChain ? (
                   <Center flexDir={"column"} py="1rem">
                     <Heading size="md">🔁 Switch Network:</Heading>
@@ -220,29 +245,202 @@ function App() {
                     </VStack>
                   )
                 ) : (
-                  <Center py="1rem">
-                    <Button
-                      color={"white"}
-                      fontWeight="bold"
-                      bgColor={"green.600"}
-                      border="2px solid"
-                      borderColor={"green.600"}
-                      _hover={{
-                        bgColor: "green.800",
-                        color: "white",
-                      }}
-                      boxShadow="lg"
-                      onClick={async () => {
-                        await createPost();
-                        closeModal();
-                      }}
-                      isLoading={isPosting}
-                      loadingText={loadingText}
-                      disabled={!lensHandle}
-                    >
-                      POST 🌿
-                    </Button>
-                  </Center>
+                  <Box mt={4}>
+                    <HStack>
+                      <Switch
+                        isChecked={canCollect}
+                        onChange={() => {
+                          if (canCollect) {
+                            // toggling off so reset other switches
+                            setPaidCollect.off();
+                            setOnlyFollowersCollect.off();
+                            setLimitedEditionCollect.off();
+                            setTimeLimitCollect.off();
+                            setPrice(0);
+                            setCurrencyIndex(0);
+                            setReferralFee(0);
+                            setCollectLimit(1);
+                          }
+
+                          setCanCollect.toggle();
+                        }}
+                      />
+                      <Text fontWeight={"bold"}>
+                        This post can be collected
+                      </Text>
+                    </HStack>
+                    {canCollect && (
+                      <Box mt={4} pl={4}>
+                        <Box>
+                          <Text fontWeight={"bold"}>
+                            💵 Charge for collecting
+                          </Text>
+                          <HStack mt={2}>
+                            <Switch
+                              isChecked={paidCollect}
+                              onChange={setPaidCollect.toggle}
+                            />
+                            <Text>
+                              Get paid whenever someone collects your post
+                            </Text>
+                          </HStack>
+                          {paidCollect && (
+                            <Box mt={4}>
+                              <HStack>
+                                <FormControl>
+                                  <FormLabel fontSize={"sm"}>Price</FormLabel>
+                                  <Input
+                                    type={"number"}
+                                    value={price}
+                                    onChange={(e) => {
+                                      const _val = e.target.value;
+                                      if (_val) {
+                                        setPrice(parseFloat(_val));
+                                      } else {
+                                        setPrice(0);
+                                      }
+                                    }}
+                                  />
+                                </FormControl>
+                                <FormControl>
+                                  <FormLabel fontSize={"sm"}>
+                                    Select Currency
+                                  </FormLabel>
+                                  <Select
+                                    variant={"filled"}
+                                    cursor="pointer"
+                                    value={currencyIndex}
+                                    onChange={(e) => {
+                                      setCurrencyIndex(
+                                        parseInt(e.target.value)
+                                      );
+                                    }}
+                                  >
+                                    {currencies.map((curr, i) => (
+                                      <option value={i} key={i}>
+                                        {curr}
+                                      </option>
+                                    ))}
+                                  </Select>
+                                </FormControl>
+                              </HStack>
+                              <Box mt={6}>
+                                <Text fontWeight={"bold"}>
+                                  🔀 Mirror referral reward
+                                </Text>
+                                <Text fontSize={"sm"}>
+                                  Share your collect fee with people who amplify
+                                  your content
+                                </Text>
+                                <FormControl
+                                  mt={2}
+                                  isInvalid={referralFee > 100}
+                                >
+                                  <FormLabel fontSize={"sm"}>
+                                    Referral fee
+                                  </FormLabel>
+                                  <InputGroup>
+                                    <Input
+                                      type={"number"}
+                                      value={referralFee}
+                                      onChange={(e) => {
+                                        const _val = e.target.value;
+                                        if (_val) {
+                                          setReferralFee(parseFloat(_val));
+                                        } else {
+                                          setReferralFee(0);
+                                        }
+                                      }}
+                                    />
+                                    <InputRightAddon>%</InputRightAddon>
+                                  </InputGroup>
+                                  {referralFee > 100 && (
+                                    <FormErrorMessage>
+                                      Please input valid percentage value
+                                    </FormErrorMessage>
+                                  )}
+                                </FormControl>
+                              </Box>
+                              <Box mt={4}>
+                                <Text fontWeight={"bold"}>
+                                  ⭐ Limited edition
+                                </Text>
+                                <HStack mt={2}>
+                                  <Switch
+                                    isChecked={limitedEditionCollect}
+                                    onChange={setLimitedEditionCollect.toggle}
+                                  />
+                                  <Text>Make the collects exclusive</Text>
+                                </HStack>
+                              </Box>
+                              {limitedEditionCollect && (
+                                <FormControl mt={2}>
+                                  <FormLabel fontSize={"sm"}>
+                                    Collect Limit
+                                  </FormLabel>
+                                  <Input
+                                    type={"number"}
+                                    value={collectLimit}
+                                    onChange={(e) => {
+                                      const _val = e.target.value;
+                                      if (_val) {
+                                        setCollectLimit(parseInt(_val));
+                                      } else {
+                                        setReferralFee(1);
+                                      }
+                                    }}
+                                  />
+                                </FormControl>
+                              )}
+                              <Box mt={4}>
+                                <Text fontWeight={"bold"}>⌛ Time limit</Text>
+                                <HStack mt={2}>
+                                  <Switch
+                                    isChecked={timeLimitCollect}
+                                    onChange={setTimeLimitCollect.toggle}
+                                  />
+                                  <Text>Limit collecting to the first 24h</Text>
+                                </HStack>
+                              </Box>
+                            </Box>
+                          )}
+                        </Box>
+                        <Box mt={4}>
+                          <Text fontWeight={"bold"}>🫂 Who can collect</Text>
+                          <HStack mt={2}>
+                            <Switch
+                              isChecked={onlyFollowersCollect}
+                              onChange={setOnlyFollowersCollect.toggle}
+                            />
+                            <Text>Only followers can collect</Text>
+                          </HStack>
+                        </Box>
+                      </Box>
+                    )}
+                    <Center mt={4}>
+                      <Button
+                        color={"white"}
+                        fontWeight="bold"
+                        bgColor={"green.600"}
+                        border="2px solid"
+                        borderColor={"green.600"}
+                        _hover={{
+                          bgColor: "green.800",
+                          color: "white",
+                        }}
+                        boxShadow="lg"
+                        onClick={async () => {
+                          await createPost();
+                          closeModal();
+                        }}
+                        isLoading={isPosting}
+                        loadingText={loadingText}
+                        disabled={!lensHandle}
+                      >
+                        POST 🌿
+                      </Button>
+                    </Center>
+                  </Box>
                 )}
               </>
             )}
