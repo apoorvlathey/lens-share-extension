@@ -1,6 +1,6 @@
 # 🌿 Lens Share Extension
 
-## Installation
+## Setting up the Project
 
 1. Clone this repository
 2. Create `.env` file and fill out variables from `.env.sample`
