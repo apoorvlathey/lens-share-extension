@@ -1,5 +1,26 @@
 # 🌿 Lens Share Extension
 
+## Installation
+
+1. Visit the <a href="https://github.com/apoorvlathey/lens-share-extension/releases/latest">latest release</a> page and download <code>lens-share-extension-x.x.x.zip</code> file under Assets.
+2. Extract the folder.
+3. Go to Extensions settings in your browser. For brave it's at: `brave://extensions/`
+4. Toggle on the "Developer mode"
+5. Click "Load unpacked" and select the folder extracted above.
+6. Lens Share is now installed!
+
+## Usage
+
+1. Go to twitter.com and click on any tweet
+2. You'd see a "Share on Lens" button beneath the tweet.
+3. Click on it.
+4. Connect your wallet & press the "Post" button.
+5. Confirm the transaction in your wallet.
+6. That's it! Your tweet will be migrated over to the Lens Protocol 🌿
+7. Lens Share handles uploading images & text to IPFS automatically in the background & offers a seamless experience to you.
+
+---
+
 ## Setting up the Project
 
 1. Clone this repository
