@@ -229,6 +229,7 @@ window.addEventListener("message", async (e) => {
     case "CREATE_POST_TYPED_DATA": {
       const createPostTypedDataRequest = e.data.msg
         .createPostTypedDataRequest as any;
+
       const res = await apolloClient.mutate({
         mutation: gql(CREATE_POST_TYPED_DATA),
         variables: {

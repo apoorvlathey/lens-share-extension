@@ -245,7 +245,27 @@ export const LensProvider = ({ children }: { children?: React.ReactNode }) => {
     localStorage.setItem("refreshToken", tokens.data.authenticate.refreshToken);
   };
 
-  const createPost = async () => {
+  const createPost = async ({
+    canCollect,
+    paidCollect,
+    onlyFollowersCollect,
+    limitedEditionCollect,
+    timeLimitCollect,
+    currencyAddress,
+    price,
+    referralFee,
+    collectLimit,
+  }: {
+    canCollect: boolean;
+    paidCollect: boolean;
+    onlyFollowersCollect: boolean;
+    limitedEditionCollect: boolean;
+    timeLimitCollect: boolean;
+    currencyAddress: string;
+    price: number;
+    referralFee: number;
+    collectLimit: number;
+  }) => {
     if (!lensHandle) {
       console.log("createPost: no lens handle");
       return;
@@ -258,7 +278,7 @@ export const LensProvider = ({ children }: { children?: React.ReactNode }) => {
     const tweetText = extractContent(
       article.querySelectorAll('div[data-testid="tweetText"]')![0].innerHTML
     );
-    // inclues photos of quotedTweets as well
+    // includes photos of quotedTweets as well
     const allTweetPhotos = article.querySelectorAll(
       'div[data-testid="tweetPhoto"]'
     );
@@ -322,11 +342,79 @@ export const LensProvider = ({ children }: { children?: React.ReactNode }) => {
     });
     console.log("create post: ipfs result", ipfsResult);
 
+    let collectModule = {};
+    if (!canCollect) {
+      collectModule = {
+        revertCollectModule: true,
+      };
+    } else {
+      if (paidCollect) {
+        if (!timeLimitCollect && !limitedEditionCollect) {
+          collectModule = {
+            feeCollectModule: {
+              amount: {
+                currency: currencyAddress,
+                value: price.toString(),
+              },
+              recipient: address,
+              referralFee,
+              followerOnly: onlyFollowersCollect,
+            },
+          };
+        } else if (!timeLimitCollect && limitedEditionCollect) {
+          collectModule = {
+            limitedFeeCollectModule: {
+              collectLimit: collectLimit.toString(),
+              amount: {
+                currency: currencyAddress,
+                value: price.toString(),
+              },
+              recipient: address,
+              referralFee,
+              followerOnly: onlyFollowersCollect,
+            },
+          };
+        } else if (timeLimitCollect && limitedEditionCollect) {
+          collectModule = {
+            limitedTimedFeeCollectModule: {
+              collectLimit: collectLimit.toString(),
+              amount: {
+                currency: currencyAddress,
+                value: price.toString(),
+              },
+              recipient: address,
+              referralFee,
+              followerOnly: onlyFollowersCollect,
+            },
+          };
+        } else if (timeLimitCollect && !limitedEditionCollect) {
+          collectModule = {
+            timedFeeCollectModule: {
+              amount: {
+                currency: currencyAddress,
+                value: price.toString(),
+              },
+              recipient: address,
+              referralFee,
+              followerOnly: onlyFollowersCollect,
+            },
+          };
+        }
+      } else {
+        collectModule = {
+          freeCollectModule: {
+            followerOnly: onlyFollowersCollect,
+          },
+        };
+      }
+    }
+
     const createPostRequest = {
       profileId,
       contentURI: ipfsResult,
-      collectModule: {
-        freeCollectModule: { followerOnly: false },
+      collectModule,
+      referenceModule: {
+        followerOnlyReferenceModule: false,
       },
     };
 

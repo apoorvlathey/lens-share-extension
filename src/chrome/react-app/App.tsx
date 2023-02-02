@@ -37,7 +37,7 @@ import {
   useNetwork,
   useSwitchNetwork,
 } from "wagmi";
-import { supportedChains } from "./config";
+import { supportedChains, config } from "./config";
 import useSupportedChain from "./hooks/useSupportedChain";
 import { useLens } from "./contexts/LensContext";
 import slicedAddress from "./utils/slicedAddress";
@@ -72,12 +72,12 @@ function App() {
   const [limitedEditionCollect, setLimitedEditionCollect] = useBoolean();
   const [timeLimitCollect, setTimeLimitCollect] = useBoolean();
 
-  const currencies = ["Wrapped Matic", "WETH", "USDC", "DAI"];
-
   const [price, setPrice] = useState(0);
-  const [currencyIndex, setCurrencyIndex] = useState(0);
-  const [referralFee, setReferralFee] = useState(0);
-  const [collectLimit, setCollectLimit] = useState(1);
+  const [currencyAddress, setCurrencyAddress] = useState<string>(
+    config.currencies[0].address
+  );
+  const [referralFee, setReferralFee] = useState<number>(0);
+  const [collectLimit, setCollectLimit] = useState<number>(1);
 
   const checkIfTwitterLoaded = () => {
     const _shareContainer = document.querySelector('[role="group"]');
@@ -257,7 +257,7 @@ function App() {
                             setLimitedEditionCollect.off();
                             setTimeLimitCollect.off();
                             setPrice(0);
-                            setCurrencyIndex(0);
+                            setCurrencyAddress(config.currencies[0].address);
                             setReferralFee(0);
                             setCollectLimit(1);
                           }
@@ -309,16 +309,14 @@ function App() {
                                   <Select
                                     variant={"filled"}
                                     cursor="pointer"
-                                    value={currencyIndex}
+                                    value={currencyAddress}
                                     onChange={(e) => {
-                                      setCurrencyIndex(
-                                        parseInt(e.target.value)
-                                      );
+                                      setCurrencyAddress(e.target.value);
                                     }}
                                   >
-                                    {currencies.map((curr, i) => (
-                                      <option value={i} key={i}>
-                                        {curr}
+                                    {config.currencies.map((curr, i) => (
+                                      <option value={curr.address} key={i}>
+                                        {curr.name}
                                       </option>
                                     ))}
                                   </Select>
@@ -430,7 +428,17 @@ function App() {
                         }}
                         boxShadow="lg"
                         onClick={async () => {
-                          await createPost();
+                          await createPost({
+                            canCollect,
+                            paidCollect,
+                            onlyFollowersCollect,
+                            limitedEditionCollect,
+                            timeLimitCollect,
+                            currencyAddress,
+                            price,
+                            referralFee,
+                            collectLimit,
+                          });
                           closeModal();
                         }}
                         isLoading={isPosting}
