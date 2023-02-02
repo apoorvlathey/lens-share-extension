@@ -39,7 +39,7 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
 const authLink = new ApolloLink((operation, forward) => {
   const accessToken = localStorage.getItem("accessToken");
   const refreshToken = localStorage.getItem("refreshToken");
-  console.log("jwt token:", accessToken);
+  // console.log("jwt token:", accessToken);
 
   if (!accessToken) {
     return forward(operation);
