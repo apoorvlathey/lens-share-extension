@@ -2,7 +2,7 @@
   "name": "Lens Share",
   "version": "0.1.2",
   "manifest_version": 3,
-  "description": "Lens Share",
+  "description": "Move your Tweets to Lens Protocol with Lens Share",
   "homepage_url": "https://lens-share.apoorv.xyz",
   "action": {
     "default_title": "Lens Share",
